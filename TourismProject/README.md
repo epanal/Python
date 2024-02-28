@@ -11,3 +11,6 @@ http://127.0.0.1:8000/weather?place=DowntownSF <br>
 http://127.0.0.1:8000/weather?place=OAK <br>
 http://127.0.0.1:8000/weather?place=SJC <br>
 http://127.0.0.1:8000/weather?place=SFO <br>
+
+Here is an example page of the weather at place = DowntownSF <br>
+![image](https://github.com/epanal/Python/assets/25993147/9d11136c-775c-4282-8570-4cd0288314b4)
