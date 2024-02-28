@@ -51,6 +51,9 @@ async def root():
 def get_weather(
         place: Literal["DowntownSF", "SFO", "SJC", "OAK"]
 ):
+    """------------------------------------------------------------------------------"""
+    """This section is used for reading in the json information and parsing it ----- """
+
     # Assign URL to variable: url of the json weather forecast of SF locations
     url_downtownSF = 'https://api.weather.gov/gridpoints/MTR/84,105/forecast'
     url_SFO = 'https://api.weather.gov/gridpoints/MTR/85,98/forecast'
@@ -82,6 +85,9 @@ def get_weather(
     forecast4 = weather[place][3]['icon']
     forecast5 = weather[place][4]['icon']
     forecast6 = weather[place][5]['icon']
+
+    """------------------------------------------------------------------------------"""
+    """This section is used for reading in the text files and ranking the text files """
 
     # Folder Path
     path = r"C:\Users\epana\PycharmProjects\tourismProject"
@@ -117,7 +123,7 @@ def get_weather(
             # count how many files
             file_path = f"{path}\{file}"
 
-            # call read text file function
+            # call text file counter
             word_count = text_file_counter(words, file_path)
             file_dict[file] = word_count
 
@@ -130,6 +136,9 @@ def get_weather(
         return top_n
 
     top_files = file_ranks(file_dict, 3)
+
+    """------------------------------------------------------------------------------"""
+    """This section is for setting up the css and html information ----------------- """
 
     # This section is for setting up the cascading style sheet
     my_css = """<style>
@@ -147,12 +156,6 @@ def get_weather(
                     text-align: left;
                 }
                 h1 {
-                    color: #007bff;
-                    font-size: 36px;
-                    margin-bottom: 20px;
-                    text-align: left;
-                }
-                h2 {
                     color: #007bff;
                     font-size: 36px;
                     margin-bottom: 20px;
@@ -182,7 +185,7 @@ def get_weather(
         <p><img src="{}" alt="Icon"> <b>{}</b>: {}</p>
         <p><img src="{}" alt="Icon"> <b>{}</b>: {}</p>
         
-        <h2>Long Term Weather in San Francisco</h2>
+        <h1>Long Term Weather in San Francisco</h1>
         <p><b>{}</b> contains {} instances of words related to nice weather so we recommend visiting <b>{}</b></p>
         <p><b>{}</b> contains {} instances of words related to nice weather so we recommend visiting <b>{}</b></p>
         <p><b>{}</b> contains {} instances of words related to nice weather so we recommend visiting <b>{}</b></p>
@@ -207,8 +210,6 @@ def get_weather(
     # Replace the style strings with the CSS
     my_final_page = my_page.replace('<style></style>', my_css)
     return HTMLResponse(content=my_final_page, media_type="text/html")
-
-
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
