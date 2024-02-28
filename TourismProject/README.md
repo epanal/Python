@@ -3,7 +3,7 @@ The Farmers Almanac text files contain descriptions of San Francisco weather by 
 
 The WeatherReqs.txt contains a list of words that are describe "nice" weather when a tourist may want to visit San Francisco.
 
-The text files should be downloaded in the same directory as the tourismProject.py script
+The text files should be downloaded in the same directory as the tourismProject.py script. In the python script, you also need to change the path to where you store the files and script.
 
 When running the Python script, a server is stood up. You can check the different places parameters of the weather endpoint at the following URLs:
 
