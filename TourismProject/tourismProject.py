@@ -45,171 +45,254 @@ async def root():
 
     return HTMLResponse(content=html_content)
 
-#print(json_data_downtownSF['properties']['periods'])
-
 @app.get("/weather")
-def get_weather(
-        place: Literal["DowntownSF", "SFO", "SJC", "OAK"]
+def get_weather(place: str = None
+        #place: Literal["DowntownSF", "SFO", "SJC", "OAK"]
 ):
-    """------------------------------------------------------------------------------"""
-    """This section is used for reading in the json information and parsing it ----- """
+    """Fetches weather information based on place entered.
 
-    # Assign URL to variable: url of the json weather forecast of SF locations
-    url_downtownSF = 'https://api.weather.gov/gridpoints/MTR/84,105/forecast'
-    url_SFO = 'https://api.weather.gov/gridpoints/MTR/85,98/forecast'
-    url_SJC = 'https://api.weather.gov/gridpoints/MTR/98,83/forecast'
-    url_OAK = 'https://api.weather.gov/gridpoints/MTR/91,101/forecast'
-
-    # send a request using the SF url
-    r_dSF = requests.get(url_downtownSF)
-    r_SFO = requests.get(url_SFO)
-    r_SJC = requests.get(url_SJC)
-    r_OAK = requests.get(url_OAK)
-
-    # parse in as a JSON
-    json_data_downtownSF = r_dSF.json()
-    json_data_SFO = r_SFO.json()
-    json_data_SJC = r_SJC.json()
-    json_data_OAK = r_OAK.json()
-
-    weather = {
-        'DowntownSF': json_data_downtownSF['properties']['periods'],
-        'SFO': json_data_SFO['properties']['periods'],
-        'SJC': json_data_SJC['properties']['periods'],
-        'OAK': json_data_OAK['properties']['periods']
-    }
-
-    forecast1 = weather[place][0]['icon']
-    forecast2 = weather[place][1]['icon']
-    forecast3 = weather[place][2]['icon']
-    forecast4 = weather[place][3]['icon']
-    forecast5 = weather[place][4]['icon']
-    forecast6 = weather[place][5]['icon']
-
-    """------------------------------------------------------------------------------"""
-    """This section is used for reading in the text files and ranking the text files """
-
-    # Folder Path
-    path = r"C:\Users\epana\PycharmProjects\tourismProject"
-
-    # Change the directory
-    os.chdir(path)
-
-    words = []
-    # get weather requirements
-    with open("WeatherReqs.txt", encoding='utf-8') as fd:
-        for line in fd:
-            words.append(line[:-1])
-
-    # Function parses through the given file and counts how many types words
-    # from the word list appear in the file. This count is returned
-    def text_file_counter(word_list, file_path):
-        word_count = 0
-        with open(file_path, 'r') as file:
-            for line in file:
-                words = line.split()
-                for word in words:
-                    word = word.strip('.,!?').lower()
-                    if word in word_list:
-                        word_count += 1
-        return word_count
-
-    file_dict = {}
-
-    # iterate through all files
-    for file in os.listdir():
-        # Check whether file is in text format or not
-        if file.endswith(".txt") and file.startswith("FarmersAlmanac"):
-            # count how many files
-            file_path = f"{path}\{file}"
-
-            # call text file counter
-            word_count = text_file_counter(words, file_path)
-            file_dict[file] = word_count
-
-    def file_ranks(file_counts, n):
-        # Sort the files based on word counts in descending order
-        sorted_files = sorted(file_counts.items(), key=lambda x: x[1], reverse=True)
-
-        # Take the top n items
-        top_n = sorted_files[:n]
-        return top_n
-
-    top_files = file_ranks(file_dict, 3)
-
-    """------------------------------------------------------------------------------"""
-    """This section is for setting up the css and html information ----------------- """
-
-    # This section is for setting up the cascading style sheet
-    my_css = """<style>
-                /* Add some CSS styles for a fancy look */
-                body {
-                    font-family: Arial, sans-serif;
-                    background-color: #f9f9f9;
-                    text-align: left;
-                    padding: 50px;
-                }
-                h0 {
-                    color: #000000;
-                    font-size: 45px;
-                    margin-bottom: 20px;
-                    text-align: left;
-                }
-                h1 {
-                    color: #007bff;
-                    font-size: 36px;
-                    margin-bottom: 20px;
-                    text-align: left;
-                }
-                p {
-                    color: #333;
-                    font-size: 18px;
-                }
-            </style>"""
-    html_content = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>Weather in {}</title>
-        <style></style>
-                 
-    </head>
-    <body>
-        <h0>Ethan Panal's Endpoint for Tourism Startup</h0>
-        <h1>Short Term Weather in {}</h1>
-        <p><img src="{}" alt="Icon"> <b>{}</b> : {}</p>
-        <p><img src="{}" alt="Icon"> <b>{}</b>: {}</p>
-        <p><img src="{}" alt="Icon"> <b>{}</b>: {}</p>
-        <p><img src="{}" alt="Icon"> <b>{}</b>: {}</p>
-        <p><img src="{}" alt="Icon"> <b>{}</b>: {}</p>
-        <p><img src="{}" alt="Icon"> <b>{}</b>: {}</p>
-        
-        <h1>Long Term Weather in San Francisco</h1>
-        <p><b>{}</b> contains {} instances of words related to nice weather so we recommend visiting <b>{}</b></p>
-        <p><b>{}</b> contains {} instances of words related to nice weather so we recommend visiting <b>{}</b></p>
-        <p><b>{}</b> contains {} instances of words related to nice weather so we recommend visiting <b>{}</b></p>
-
-    </body>
-        
-    </html>
+    Args:
+        place: identifier for weather information of the location
+          
+    Returns:
+        HTML content about the short term and long range forecast to display on a webpage
     """
-    # format the html content with the corresponding {} arguments
-    my_page = html_content.format(place, place,
-               forecast1, weather[place][0]['name'],weather[place][0]['detailedForecast'],
-               forecast2, weather[place][1]['name'],weather[place][1]['detailedForecast'],
-               forecast3, weather[place][2]['name'],weather[place][2]['detailedForecast'],
-               forecast4, weather[place][3]['name'], weather[place][3]['detailedForecast'],
-               forecast5, weather[place][4]['name'], weather[place][4]['detailedForecast'],
-               forecast6, weather[place][5]['name'], weather[place][5]['detailedForecast'],
-               top_files[0][0], top_files[0][1], top_files[0][0].replace('FarmersAlmanac','').replace('SF.txt','').strip(),
-               top_files[1][0], top_files[1][1], top_files[1][0].replace('FarmersAlmanac','').replace('SF.txt','').strip(),
-               top_files[2][0], top_files[2][1], top_files[2][0].replace('FarmersAlmanac','').replace('SF.txt','').strip()
-               )
+    if place:
+        # Assign URL to variable: url of the json weather forecast of SF locations
+        url_downtownSF = 'https://api.weather.gov/gridpoints/MTR/84,105/forecast'
+        url_SFO = 'https://api.weather.gov/gridpoints/MTR/85,98/forecast'
+        url_SJC = 'https://api.weather.gov/gridpoints/MTR/98,83/forecast'
+        url_OAK = 'https://api.weather.gov/gridpoints/MTR/91,101/forecast'
 
-    # Replace the style strings with the CSS
-    my_final_page = my_page.replace('<style></style>', my_css)
-    return HTMLResponse(content=my_final_page, media_type="text/html")
+        # send a request using the SF url
+        r_dSF = requests.get(url_downtownSF)
+        r_SFO = requests.get(url_SFO)
+        r_SJC = requests.get(url_SJC)
+        r_OAK = requests.get(url_OAK)
 
+        # parse in as a JSON
+        json_data_downtownSF = r_dSF.json()
+        json_data_SFO = r_SFO.json()
+        json_data_SJC = r_SJC.json()
+        json_data_OAK = r_OAK.json()
+
+        weather = {
+            'DowntownSF': json_data_downtownSF['properties']['periods'],
+            'SFO': json_data_SFO['properties']['periods'],
+            'SJC': json_data_SJC['properties']['periods'],
+            'OAK': json_data_OAK['properties']['periods']
+        }
+
+        forecast1 = weather[place][0]['icon']
+        forecast2 = weather[place][1]['icon']
+        forecast3 = weather[place][2]['icon']
+        forecast4 = weather[place][3]['icon']
+        forecast5 = weather[place][4]['icon']
+        forecast6 = weather[place][5]['icon']
+
+        """------------------------------------------------------------------------------"""
+        """This section is used for reading in the text files and ranking the text files """
+
+        # Folder Path
+        path = r"C:\Users\epana\PycharmProjects\tourismProject"
+
+        # Change the directory
+        os.chdir(path)
+
+        words = []
+        # get weather requirements
+        with open("WeatherReqs.txt", encoding='utf-8') as fd:
+            for line in fd:
+                words.append(line[:-1])
+        # print criteria words
+        print('Searching Farmers Alamanac text files for these words:',words)
+
+        # Function parses through the given file and counts how many types words
+        # from the word list appear in the file. This count is returned
+        def text_file_counter(word_list, file_path):
+            word_count = 0
+            with open(file_path, 'r') as file:
+                for line in file:
+                    words = line.split()
+                    for word in words:
+                        word = word.strip('.,!?').lower()
+                        if word in word_list:
+                            word_count += 1
+            return word_count
+
+        file_dict = {}
+
+        # iterate through all files
+        for file in os.listdir():
+            # Check whether file is in text format or not
+            if file.endswith(".txt") and file.startswith("FarmersAlmanac"):
+                # count how many files
+                file_path = f"{path}\{file}"
+
+                # call text file counter
+                word_count = text_file_counter(words, file_path)
+                file_dict[file] = word_count
+
+        def file_ranks(file_counts, n):
+            # Sort the files based on word counts in descending order
+            sorted_files = sorted(file_counts.items(), key=lambda x: x[1], reverse=True)
+
+            #print the ranking of the sorted files in the terminal
+            for i,j in enumerate(sorted_files):
+                print('Rank is:', i+1, j[0],'contains ',j[1], 'words from the criteria file')
+            # Take the top n items
+            top_n = sorted_files[:n]
+            return top_n
+
+        top_files = file_ranks(file_dict, 3)
+
+        """------------------------------------------------------------------------------"""
+        """This section is for setting up the css and html information ----------------- """
+
+        # This section is for setting up the cascading style sheet
+        my_css = """<style>
+                    /* Add some CSS styles for a fancy look */
+                    body {
+                        font-family: Arial, sans-serif;
+                        background-color: #f9f9f9;
+                        text-align: left;
+                        padding: 50px;
+                    }
+                    h0 {
+                        color: #000000;
+                        font-size: 45px;
+                        margin-bottom: 20px;
+                        text-align: left;
+                    }
+                    h1 {
+                        color: #007bff;
+                        font-size: 36px;
+                        margin-bottom: 20px;
+                        text-align: left;
+                    }
+                    p {
+                        color: #333;
+                        font-size: 18px;
+                    }
+                </style>"""
+        html_content = """
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Weather in {}</title>
+            <style></style>
+                     
+        </head>
+        <body>
+            <h0>Ethan Panal's Endpoint for Tourism Startup</h0>
+            <p><a href="/weather">Go to Main Weather Page</a></p>
+            <h1>Short Term Weather in {}</h1>
+            <p><img src="{}" alt="Icon"> <b>{}</b> : {}</p>
+            <p><img src="{}" alt="Icon"> <b>{}</b>: {}</p>
+            <p><img src="{}" alt="Icon"> <b>{}</b>: {}</p>
+            <p><img src="{}" alt="Icon"> <b>{}</b>: {}</p>
+            <p><img src="{}" alt="Icon"> <b>{}</b>: {}</p>
+            <p><img src="{}" alt="Icon"> <b>{}</b>: {}</p>
+            
+            <h1>Long Term Weather in San Francisco</h1>
+            <p><b>{}</b> contains {} instances of words related to nice weather so we recommend visiting San Francisco in <b>{}</b></p>
+            <p><b>{}</b> contains {} instances of words related to nice weather so we recommend visiting San Francisco in <b>{}</b></p>
+            <p><b>{}</b> contains {} instances of words related to nice weather so we recommend visiting San Francisco in <b>{}</b></p>
+    
+        </body>
+            
+        </html>
+        """
+        # format the html content with the corresponding {} arguments
+        my_page = html_content.format(place, place,
+                   forecast1, weather[place][0]['name'],weather[place][0]['detailedForecast'],
+                   forecast2, weather[place][1]['name'],weather[place][1]['detailedForecast'],
+                   forecast3, weather[place][2]['name'],weather[place][2]['detailedForecast'],
+                   forecast4, weather[place][3]['name'], weather[place][3]['detailedForecast'],
+                   forecast5, weather[place][4]['name'], weather[place][4]['detailedForecast'],
+                   forecast6, weather[place][5]['name'], weather[place][5]['detailedForecast'],
+                   top_files[0][0], top_files[0][1], top_files[0][0].replace('FarmersAlmanac','').replace('SF.txt','').strip(),
+                   top_files[1][0], top_files[1][1], top_files[1][0].replace('FarmersAlmanac','').replace('SF.txt','').strip(),
+                   top_files[2][0], top_files[2][1], top_files[2][0].replace('FarmersAlmanac','').replace('SF.txt','').strip()
+                   )
+
+        # Replace the style strings with the CSS
+        my_final_page = my_page.replace('<style></style>', my_css)
+        return HTMLResponse(content=my_final_page, media_type="text/html")
+    else:
+        my_css = """<style>
+                            /* Add some CSS styles for a fancy look */
+                            body {
+                                font-family: Arial, sans-serif;
+                                background-color: #f9f9f9;
+                                text-align: left;
+                                padding: 50px;
+                            }
+                            h0 {
+                                color: #000000;
+                                font-size: 45px;
+                                margin-bottom: 20px;
+                                text-align: left;
+                            }
+                            h1 {
+                                color: #007bff;
+                                font-size: 36px;
+                                margin-bottom: 20px;
+                                text-align: left;
+                            }
+                            p {
+                                color: #333;
+                                font-size: 18px;
+                            }
+                        </style>"""
+        my_css = """<style>
+                            /* Add some CSS styles for a fancy look */
+                            body {
+                                font-family: Arial, sans-serif;
+                                background-color: #f9f9f9;
+                                text-align: left;
+                                padding: 50px;
+                            }
+                            h0 {
+                                color: #000000;
+                                font-size: 45px;
+                                margin-bottom: 20px;
+                                text-align: left;
+                            }
+                            h1 {
+                                color: #007bff;
+                                font-size: 36px;
+                                margin-bottom: 20px;
+                                text-align: left;
+                            }
+                            p {
+                                color: #333;
+                                font-size: 18px;
+                            }
+                        </style>"""
+        html_content = """
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Weather in San Francisco</title>
+                    <style></style>
+
+                </head>
+                <body>
+                    <h0>Ethan Panal's Endpoint for Tourism Startup</h0>
+                    <h1>Places</h1>
+                    <p>Check weather at <a href="/weather?place=DowntownSF">Downtown SF</a>, <a href="/weather?place=SFO">SFO</a>, <a href="/weather?place=SJC">SJC</a>, or <a href="/weather?place=OAK">OAK</a></p>
+
+
+                </body>
+
+                </html>
+                """
+        # format the html content with the corresponding {} arguments
+        my_page = html_content.format()
+        my_final_page = my_page.replace('<style></style>', my_css)
+        return HTMLResponse(content=my_final_page, media_type="text/html")
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
