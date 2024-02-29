@@ -46,16 +46,16 @@ async def root():
     return HTMLResponse(content=html_content)
 
 @app.get("/weather")
-def get_weather(place: str = None
-        #place: Literal["DowntownSF", "SFO", "SJC", "OAK"]
-):
+def get_weather(place: str = None):
     """Fetches weather information based on place entered.
 
     Args:
         place: identifier for weather information of the location
-          
+
     Returns:
-        HTML content about the short term and long range forecast to display on a webpage
+        HTML content about the short term and long range forecast to display on a webpage,
+        If no place parameter is queried, a general HTML page displays with links for the
+        various place parameters
     """
     if place:
         # Assign URL to variable: url of the json weather forecast of SF locations
@@ -92,6 +92,7 @@ def get_weather(place: str = None
 
         """------------------------------------------------------------------------------"""
         """This section is used for reading in the text files and ranking the text files """
+        """------------------------------------------------------------------------------"""
 
         # Folder Path
         path = r"C:\Users\epana\PycharmProjects\tourismProject"
@@ -147,9 +148,10 @@ def get_weather(place: str = None
         top_files = file_ranks(file_dict, 3)
 
         """------------------------------------------------------------------------------"""
-        """This section is for setting up the css and html information ----------------- """
+        """       This section is for setting up the css and html information            """
+        """------------------------------------------------------------------------------"""
 
-        # This section is for setting up the cascading style sheet
+        # Cascading style sheet
         my_css = """<style>
                     /* Add some CSS styles for a fancy look */
                     body {
@@ -175,6 +177,8 @@ def get_weather(place: str = None
                         font-size: 18px;
                     }
                 </style>"""
+
+        # HTML content
         html_content = """
         <!DOCTYPE html>
         <html lang="en">
@@ -221,31 +225,10 @@ def get_weather(place: str = None
         my_final_page = my_page.replace('<style></style>', my_css)
         return HTMLResponse(content=my_final_page, media_type="text/html")
     else:
-        my_css = """<style>
-                            /* Add some CSS styles for a fancy look */
-                            body {
-                                font-family: Arial, sans-serif;
-                                background-color: #f9f9f9;
-                                text-align: left;
-                                padding: 50px;
-                            }
-                            h0 {
-                                color: #000000;
-                                font-size: 45px;
-                                margin-bottom: 20px;
-                                text-align: left;
-                            }
-                            h1 {
-                                color: #007bff;
-                                font-size: 36px;
-                                margin-bottom: 20px;
-                                text-align: left;
-                            }
-                            p {
-                                color: #333;
-                                font-size: 18px;
-                            }
-                        </style>"""
+
+        """------------------------------------------------------------------------------"""
+        """       This section is for setting displaying just the /weather page          """
+        """------------------------------------------------------------------------------"""
         my_css = """<style>
                             /* Add some CSS styles for a fancy look */
                             body {
@@ -294,5 +277,7 @@ def get_weather(place: str = None
         my_page = html_content.format()
         my_final_page = my_page.replace('<style></style>', my_css)
         return HTMLResponse(content=my_final_page, media_type="text/html")
+
+# Main function
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
