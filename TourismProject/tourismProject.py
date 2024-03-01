@@ -57,6 +57,8 @@ def get_weather(place: str = None):
         If no place parameter is queried, a general HTML page displays with links for the
         various place parameters
     """
+
+    # Display if a parameter query is entered into the URL
     if place:
         # Assign URL to variable: url of the json weather forecast of SF locations
         url_downtownSF = 'https://api.weather.gov/gridpoints/MTR/84,105/forecast'
