@@ -13,7 +13,8 @@ http://127.0.0.1:8000/weather?place=SJC <br>
 http://127.0.0.1:8000/weather?place=SFO <br>
 
 Here is an example page of the weather at place = DowntownSF <br>
-![image](https://github.com/epanal/Python/assets/25993147/4693d86c-5577-4d93-9d31-bf93d5373343)
+![image](https://github.com/epanal/Python/assets/25993147/aa6483e0-a15f-4f08-bde8-c59fc3e2d49d)
+
 
 
 On the output console, the ranking for the Farmers Almanac text files are printed out: 
