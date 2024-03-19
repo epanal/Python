@@ -1,4 +1,6 @@
 **README**
+Background color used in pages is: #FFD4C5
+
 The Farmers Almanac text files contain descriptions of San Francisco weather by month.
 
 The WeatherReqs.txt contains a list of words that are describe "nice" weather when a tourist may want to visit San Francisco.
