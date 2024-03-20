@@ -17,46 +17,6 @@ warnings.filterwarnings("ignore", "use_inf_as_na")
 app = FastAPI()
 
 
-@app.get("/", response_class=HTMLResponse)
-async def root():
-    html_content = """<!DOCTYPE html>
-    <html lang="en">
-       <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Welcome to Our Website!</title>
-          <style>
-             /* Add some CSS styles for a fancy look */
-             body {
-             font-family: Arial, sans-serif;
-             background-color: #FFD4C5;
-             text-align: center;
-             padding: 50px;
-             }
-             h1 {
-             color: #007bff;
-             font-size: 36px;
-             margin-bottom: 20px;
-             }
-             p {
-             color: #333;
-             font-size: 18px;
-             }
-          </style>
-          <p><img src="https://github.com/epanal/Python/blob/main/TourismProject/SFTourismLogo.jpg?raw=true" alt="Icon"> </p>
-       </head>
-       <body>
-          <h1>Welcome to ABC to the E page for San Francisco tourism !</h1>
-          <p>Explore our content to discover San Francisco food spots and landmarks. Check the latest transportation, weather, and safety information!</p>
-          <p><a href="/attractions">Attractions</a></p>
-          <p><a href="/restaurants">Restaurants</a></p>
-          <p><a href="/weather">Weather</a></p>
-          <p><a href="/transportation">Transportation</a></p>
-          <p><a href="/safety">Safety</a></p>
-       </body>
-    </html>"""
-    return HTMLResponse(content=html_content)
-
 @app.get("/weather")
 def get_weather(place: str = None):
     """Fetches weather information based on place entered, along with findings and recommendations for
@@ -437,6 +397,46 @@ def get_weather(place: str = None):
         my_final_page = my_page.replace('<style></style>', my_css)
         return HTMLResponse(content=my_final_page, media_type="text/html")
 
+@app.get("/", response_class=HTMLResponse)
+async def root():
+    html_content = """<!DOCTYPE html>
+    <html lang="en">
+       <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Welcome to Our Website!</title>
+          <style>
+             /* Add some CSS styles for a fancy look */
+             body {
+             font-family: Arial, sans-serif;
+             background-color: #FFD4C5;
+             text-align: center;
+             padding: 50px;
+             }
+             h1 {
+             color: #007bff;
+             font-size: 36px;
+             margin-bottom: 20px;
+             }
+             p {
+             color: #333;
+             font-size: 18px;
+             }
+          </style>
+          <p><img src="https://github.com/epanal/Python/blob/main/TourismProject/SFTourismLogo.jpg?raw=true" alt="Icon"> </p>
+       </head>
+       <body>
+          <h1>Welcome to ABC to the E page for San Francisco tourism !</h1>
+          <p>Explore our content to discover San Francisco food spots and landmarks. Check the latest transportation, weather, and safety information!</p>
+          <p><a href="/attractions">Attractions</a></p>
+          <p><a href="/restaurants">Restaurants</a></p>
+          <p><a href="/weather">Weather</a></p>
+          <p><a href="/transportation">Transportation</a></p>
+          <p><a href="/safety">Safety</a></p>
+       </body>
+    </html>"""
+    return HTMLResponse(content=html_content)
+
 
 @app.get("/transportation")
 def get_transportation():
@@ -610,6 +610,196 @@ def get_transportation():
     # Replace the style strings with the CSS
     my_final_page = my_page.replace('<style></style>', my_css)
     return HTMLResponse(content=my_final_page, media_type="text/html")
+
+@app.get("/attractions", response_class=HTMLResponse)
+def get_attractions():
+    # Cascading style sheet
+    my_css = """
+            <style>
+               /* Add some CSS styles for a fancy look */
+               body {
+               font-family: Arial, sans-serif;
+               background-color: #FFD4C5;
+               text-align: center;
+               padding: 50px;
+               }
+               h0 {
+               color: #000000;
+               font-size: 45px;
+               margin-bottom: 20px;
+               text-align: center;
+               }
+               h1 {
+               color: #007bff;
+               font-size: 36px;
+               margin-bottom: 20px;
+               text-align: center;
+               }
+               p {
+               color: #333;
+               font-size: 18px;
+               }
+                .my-div {
+                width: fit-content;  /* Set the desired width */
+                margin: 0 auto;  /* Center horizontally */
+                border-style: solid;
+                border-width: 2px;
+                border-color: black;
+            </style>
+            """
+    # HTML content
+    html_content = """
+    <!DOCTYPE html>
+    <html lang="en">
+       <head>
+          <meta charset="UTF-8">
+          <title>Attractions in San Francisco</title>
+          <style></style>
+          <p><img src="https://raw.githubusercontent.com/epanal/Python/main/tourism_project_final/SFAttractionLogo.jpg" alt="Icon"> </p>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       </head>
+       <body>
+          <p><a href="/">Go back to Main Page</a></p>
+          <h1>Attraction Stuff:</h1>
+
+          <p><b>Recommendations: </b></p>
+       </body>
+    </html>
+    """
+    # format the html content with the corresponding {} arguments
+    my_page = html_content.format()
+
+    # Replace the style strings with the CSS
+    my_final_page = my_page.replace('<style></style>', my_css)
+    return HTMLResponse(content=my_final_page, media_type="text/html")
+
+@app.get("/safety", response_class=HTMLResponse)
+def get_safety():
+    # Cascading style sheet
+    my_css = """
+            <style>
+               /* Add some CSS styles for a fancy look */
+               body {
+               font-family: Arial, sans-serif;
+               background-color: #FFD4C5;
+               text-align: center;
+               padding: 50px;
+               }
+               h0 {
+               color: #000000;
+               font-size: 45px;
+               margin-bottom: 20px;
+               text-align: center;
+               }
+               h1 {
+               color: #007bff;
+               font-size: 36px;
+               margin-bottom: 20px;
+               text-align: center;
+               }
+               p {
+               color: #333;
+               font-size: 18px;
+               }
+                .my-div {
+                width: fit-content;  /* Set the desired width */
+                margin: 0 auto;  /* Center horizontally */
+                border-style: solid;
+                border-width: 2px;
+                border-color: black;
+            </style>
+            """
+    # HTML content
+    html_content = """
+    <!DOCTYPE html>
+    <html lang="en">
+       <head>
+          <meta charset="UTF-8">
+          <title>Safety in San Francisco</title>
+          <style></style>
+          <p><img src="https://raw.githubusercontent.com/epanal/Python/main/tourism_project_final/SFSafetyLogo.jpg" alt="Icon"> </p>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       </head>
+       <body>
+          <p><a href="/">Go back to Main Page</a></p>
+          <h1>Safety Stuff:</h1>
+
+          <p><b>Recommendations: </b></p>
+       </body>
+    </html>
+    """
+    # format the html content with the corresponding {} arguments
+    my_page = html_content.format()
+
+    # Replace the style strings with the CSS
+    my_final_page = my_page.replace('<style></style>', my_css)
+    return HTMLResponse(content=my_final_page, media_type="text/html")
+
+@app.get("/restaurants", response_class=HTMLResponse)
+def get_restaurants():
+    # Cascading style sheet
+    my_css = """
+            <style>
+               /* Add some CSS styles for a fancy look */
+               body {
+               font-family: Arial, sans-serif;
+               background-color: #FFD4C5;
+               text-align: center;
+               padding: 50px;
+               }
+               h0 {
+               color: #000000;
+               font-size: 45px;
+               margin-bottom: 20px;
+               text-align: center;
+               }
+               h1 {
+               color: #007bff;
+               font-size: 36px;
+               margin-bottom: 20px;
+               text-align: center;
+               }
+               p {
+               color: #333;
+               font-size: 18px;
+               }
+                .my-div {
+                width: fit-content;  /* Set the desired width */
+                margin: 0 auto;  /* Center horizontally */
+                border-style: solid;
+                border-width: 2px;
+                border-color: black;
+            </style>
+            """
+    # HTML content
+    html_content = """
+    <!DOCTYPE html>
+    <html lang="en">
+       <head>
+          <meta charset="UTF-8">
+          <title>Safety in San Francisco</title>
+          <style></style>
+          <p><img src="https://raw.githubusercontent.com/epanal/Python/main/tourism_project_final/SFRestaurantLogo.jpg" alt="Icon"> </p>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       </head>
+       <body>
+          <p><a href="/">Go back to Main Page</a></p>
+          <h1>Restaurant Stuff:</h1>
+
+          <p><b>Recommendations: </b></p>
+       </body>
+    </html>
+    """
+    # format the html content with the corresponding {} arguments
+    my_page = html_content.format()
+
+    # Replace the style strings with the CSS
+    my_final_page = my_page.replace('<style></style>', my_css)
+    return HTMLResponse(content=my_final_page, media_type="text/html")
+
+
+
+
 # Main function
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)
