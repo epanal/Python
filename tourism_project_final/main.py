@@ -295,8 +295,7 @@ def get_weather(place: str = None):
             str: This function returns html content for plotting SF locations on a map and displaying the current
             weather at that location.
             """
-            # lat longs of SF Bay area locations
-            ll = [[37.7937, -122.3965], [37.6193, -122.3816], [37.3387,-121.8853], [37.7191, -122.2195]]
+            ll = [[37.7937, -122.3965], [37.6193, -122.3816], [37.3387, -121.8853], [37.7191, -122.2195]]
             SF_url = 'https://api.weather.gov/gridpoints/MTR/84,105/forecast'
             SFO_url = 'https://api.weather.gov/gridpoints/MTR/85,98/forecast'
             SJC_url = 'https://api.weather.gov/gridpoints/MTR/98,83/forecast'
@@ -310,16 +309,45 @@ def get_weather(place: str = None):
             json_sf = r_sf.json()
             json_sfo = r_sfo.json()
             json_sjc = r_sjc.json()
-            json_oak= r_oak.json()
+            json_oak = r_oak.json()
 
-            # Creates a dataframe with current forecast information to display
-            place_name = ['DowntownSF','SFO','SJC','OAK']
-            coord_df = pd.DataFrame(columns = ['place','lat','long','current_weather'])
+            place_name = ['DowntownSF', 'SFO', 'SJC', 'OAK']
+            coord_df = pd.DataFrame(columns=['place', 'lat', 'long', 'current_weather'])
             coord_df['place'] = place_name
-            coord_df['current_weather'][0] = json_sf['properties']['periods'][0]['detailedForecast']
-            coord_df['current_weather'][1] = json_sfo['properties']['periods'][0]['detailedForecast']
-            coord_df['current_weather'][2] = json_sjc['properties']['periods'][0]['detailedForecast']
-            coord_df['current_weather'][3] = json_oak['properties']['periods'][0]['detailedForecast']
+            try:
+                if 'properties' in json_sf and 'periods' in json_sf['properties']:
+                    coord_df['current_weather'][0] = json_sf['properties']['periods'][0]['detailedForecast']
+                else:
+                    coord_df['current_weather'][
+                        0] = "Weather.gov Forecast Grid Expired, current service alert occurring"
+            except (KeyError, IndexError):
+                coord_df['current_weather'][0] = "Error retrieving forecast data (check API response format)"
+            try:
+                if 'properties' in json_sfo:
+                    coord_df['current_weather'][1] = json_sfo['properties']['periods'][0]['detailedForecast']
+                else:
+                    coord_df['current_weather'][
+                        1] = "Weather.gov Forecast Grid Expired, current service alert occurring"
+            except (KeyError, IndexError):
+                coord_df['current_weather'][1] = "Error retrieving forecast data (check API response format)"
+
+            try:
+                if 'properties' in json_sjc:
+                    coord_df['current_weather'][2] = json_sjc['properties']['periods'][0]['detailedForecast']
+                else:
+                    coord_df['current_weather'][
+                        2] = "Weather.gov Forecast Grid Expired, current service alert occurring"
+            except (KeyError, IndexError):
+                coord_df['current_weather'][2] = "Error retrieving forecast data (check API response format)"
+
+            try:
+                if 'properties' in json_oak:
+                    coord_df['current_weather'][3] = json_oak['properties']['periods'][0]['detailedForecast']
+                else:
+                    coord_df['current_weather'][
+                        3] = "Weather.gov Forecast Grid Expired, current service alert occurring"
+            except (KeyError, IndexError):
+                coord_df['current_weather'][3] = "Error retrieving forecast data (check API response format)"
 
             # Fill the dataframe with lat/long
             for i in range(len(place_name)):
