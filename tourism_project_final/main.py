@@ -478,6 +478,24 @@ def get_transportation():
             areas.append(te['areas'][0]['name'])
             roads.append(te['roads'][0]['name'])
 
+        # Create traffic dataframe from mapping
+        traffic_df = pd.DataFrame(columns=['event', 'type', 'lat', 'long', 'headline'])
+        for i in range(len(traffic_events)):
+            traffic_df.loc[i, 'event'] = traffic_events[i]['id']
+            traffic_df.loc[i, 'type'] = traffic_events[i]['event_type']
+            traffic_df.loc[i, 'lat'] = traffic_events[i]['geography']['coordinates'][1]
+            traffic_df.loc[i, 'long'] = traffic_events[i]['geography']['coordinates'][0]
+            traffic_df.loc[i, 'headline'] = traffic_events[i]['headline']
+
+        # Create the map plot
+        fig = px.scatter_mapbox(traffic_df, title='Bay Area Traffic Events',
+                                lat="lat", lon="long", hover_name='type', text=traffic_df.headline.str.wrap(30).apply(lambda x: x.replace('\n', '<br>')), zoom=8, height=500,
+                                width=850)
+        fig.update_layout(mapbox_style="open-street-map", margin={"r": 0, "t": 0, "l": 0, "b": 0})
+        fig.update_traces(marker_size=18)
+        html_div = plot(fig, output_type='div', include_plotlyjs=False)
+
+
         # Count up the different events, areas, and roads mentioned
         event_count = Counter(event_type)
         area_count = Counter(areas)
@@ -519,8 +537,8 @@ def get_transportation():
               '. Expect delays in these areas and consider avoiding: ' + str(avoid_roads)
         print(transpo_rec_str)
 
-        return transpo_findings_str,transpo_rec_str
-    transpo_f, transpo_rec = transportation_recommendation()
+        return transpo_findings_str,transpo_rec_str, html_div
+    transpo_f, transpo_rec, html_div = transportation_recommendation()
 
     """------------------------------------------------------------------------------"""
     """This section is for setting up the css and html information for transportation"""
@@ -552,6 +570,12 @@ def get_transportation():
                color: #333;
                font-size: 18px;
                }
+                .my-div {
+                width: fit-content;  /* Set the desired width */
+                margin: 0 auto;  /* Center horizontally */
+                border-style: solid;
+                border-width: 2px;
+                border-color: black;
             </style>
             """
     # HTML content
@@ -563,17 +587,25 @@ def get_transportation():
           <title>Transportation in San Francisco</title>
           <style></style>
           <p><img src="https://github.com/epanal/Python/blob/main/TourismProject/SFTransportationLogo.jpg?raw=true" alt="Icon"> </p>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Traffic Alerts in San Francisco</title>
+            <!-- Include Plotly.js -->
+            <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
        </head>
        <body>
           <p><a href="/">Go back to Main Page</a></p>
           <h1>Traffic Alerts:</h1>
+            <!-- Display the Plotly figure -->
+                <div class="my-div">
+                    {}
+                </div>
           <p>{}</p>
           <p><b>Recommendations: </b>{}</p>
        </body>
     </html>
     """
     # format the html content with the corresponding {} arguments
-    my_page = html_content.format(transpo_f, transpo_rec)
+    my_page = html_content.format(html_div, transpo_f, transpo_rec)
 
     # Replace the style strings with the CSS
     my_final_page = my_page.replace('<style></style>', my_css)
