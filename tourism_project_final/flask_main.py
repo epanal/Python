@@ -848,6 +848,64 @@ def get_attractions(
 
 @app.route("/safety")
 def get_safety():
+    api_url = "https://data.sfgov.org/resource/wg3w-h783.json"
+
+    # parameter filters
+    params = {
+        # "$limit": 1000,
+        "$$app_token": "qHVb4aAcnhiRAx0wHvI9NxNxK",
+        "$select": "incident_date, incident_time, analysis_neighborhood, incident_category",
+        "$order": "incident_date DESC",
+    }
+
+    def fetch_data(url, parameters):
+        try:
+            response = requests.get(url, params=parameters)
+            response.raise_for_status()  # Raise an exception for HTTP errors
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print("Error fetching data:", e)
+            return None
+
+    # fetch data from API
+    data = fetch_data(api_url, params)
+    if not data:
+        raise HTTPException(status_code=500, detail="Failed to fetch data from the API")
+
+    # analyze data for crime count by district, incident count by category, day vs night count, and date range
+    district_crime_count = {}
+    incident_category_count = {}
+    day_count = 0
+    night_count = 0
+    dates = []
+
+    for incident in data:
+        district = incident.get("analysis_neighborhood", "Unknown")
+        district_crime_count[district] = district_crime_count.get(district, 0) + 1
+
+        category = incident.get("incident_category", "Unknown")
+        incident_category_count[category] = incident_category_count.get(category, 0) + 1
+
+        incident_time = incident.get("incident_time", "")
+        if incident_time:
+            hour = int(incident_time.split(":")[0])
+            if 6 <= hour < 18:
+                day_count += 1
+            else:
+                night_count += 1
+
+        incident_date = incident.get("incident_date", "")
+        if incident_date:
+            dates.append(incident_date)
+
+    # sort crime count by district and incident count by category
+    sorted_district_crime_count = dict(sorted(district_crime_count.items(), key=lambda x: x[1], reverse=True))
+    sorted_incident_category_count = dict(sorted(incident_category_count.items(), key=lambda x: x[1], reverse=True))
+
+    # calculate date range
+    min_date = min(dates)[:10]
+    max_date = max(dates)[:10]
+
     # HTML content
     html_content = """
     <!DOCTYPE html>
@@ -856,25 +914,49 @@ def get_safety():
           <meta charset="UTF-8">
           <title>Safety in San Francisco</title>
           <style></style>
+          <p><img src="https://raw.githubusercontent.com/epanal/Python/main/tourism_project_final/SFSafetyLogo.jpg" alt="Icon"> </p>
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
        </head>
-       <body>
-          <div class="content">
-          <p><img src="https://raw.githubusercontent.com/epanal/Python/main/tourism_project_final/SFSafetyLogo.jpg" alt="Icon"> </p>
+       <body2>
           <p><a href="/">Go back to Main Page</a></p>
-          <h1>Safety Stuff:</h1>
+          <h1>Safety Insights:</h1>
 
-          <p><b>Recommendations: </b></p>
-          </div>
-       </body>
-    </html>
     """
+    for district, count in sorted_district_crime_count.items():
+        html_content += f"<li>{district}: {count} incidents</li>"
+
+    html_content += """
+                </ul>
+                <h1>Incident count by category:</h1>
+                <ul>
+        """
+    for category, count in sorted_incident_category_count.items():
+        html_content += f"<li>{category}: {count} incidents</li>"
+
+    html_content += """
+                </ul>
+                <h1>Count of crimes that occurred in the day vs night:</h1>
+                <p>Day: {day_count} incidents</p>
+                <p>Night: {night_count} incidents</p>
+                <h1>Date range of incidents:</h1>
+                <p>From: {min_date}</p>
+                <p>To: {max_date}</p>
+                <h1> Insights from scraping Data </h1>
+                <h1><img src="https://raw.githubusercontent.com/epanal/Python/main/tourism_project_final/safety_plots/bk_image1.jpg" alt="Icon" border="1"> </h1>
+                <h1><img src="https://raw.githubusercontent.com/epanal/Python/main/tourism_project_final/safety_plots/bk_image2.jpg" alt="Icon" border="1"> </h1>
+                <h1><img src="https://raw.githubusercontent.com/epanal/Python/main/tourism_project_final/safety_plots/bk_image3.jpg" alt="Icon" border="1"> </h1>
+
+            </body2>
+            </html>
+        """
     # format the html content with the corresponding {} arguments
-    my_page = html_content.format()
+    my_page = html_content.format(day_count=day_count, night_count=night_count, min_date=min_date,
+                                           max_date=max_date)
 
     # Replace the style strings with the CSS
     my_final_page = my_page.replace('<style></style>', my_css)
     return my_final_page
+
 
 @app.route("/restaurants")
 def get_restaurants():
