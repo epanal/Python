@@ -1,0 +1,12 @@
+combined_discussions - all the discussion forums combined and also denotes the course
+ac_discussion1 -  Introduction, hobbies
+ac_discussion2 -  Describe real world linear regression problem
+ac_discussion3 -  Describe first 5 weeks, like/dislike about R
+ac_discussion4 -  Describe clustering algorithms and how they solve problems
+ac_discussion5 -  What is your dream data science job? Course recs
+ac_audienceblog1 - Analytics Computing Project Fair blog 1
+ac_audienceblog2 - Analytics Computing Project Fair blog 2
+dw_discussion1 -  Discuss how data wrangling was used in Prediction by Numbers video
+dw_discussion2 -  Discuss ethical issues dangers on generative AI in NOVA video
+dw_discussion3 -  Select API, project, and how you would use it
+dw_discussion4 - Data wrangling project writeup / advice for future students
